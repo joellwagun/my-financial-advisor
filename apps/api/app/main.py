@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers import ocr
+from app.routers import ocr, auth
 
 app = FastAPI(
     title="My Financial Advisor API",
@@ -18,6 +18,7 @@ app.add_middleware(
 
 routers = [
     ocr.router,
+    auth.router,
 ]
 
 for router in routers:
@@ -32,3 +33,5 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+

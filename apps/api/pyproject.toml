@@ -24,4 +24,5 @@ dependencies = [
   "pandas==2.2.2",
   "joblib==1.4.2",
   "ollama==0.3.3",
+  "email-validator==2.2.0",
 ]

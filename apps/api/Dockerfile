@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     tesseract-ocr \
+    tesseract-ocr-nep \
     libgl1 \
     && rm -rf /var/lib/apt/lists/*
 

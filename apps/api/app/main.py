@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers import ocr, auth
+from app.routers import ocr, auth, expenses, chat
 
 app = FastAPI(
-    title="My Financial Advisor API",
+    title="OCR",
     version="0.1.0",
 )
 
@@ -19,6 +19,8 @@ app.add_middleware(
 routers = [
     ocr.router,
     auth.router,
+    expenses.router,
+    chat.router,
 ]
 
 for router in routers:

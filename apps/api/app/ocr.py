@@ -12,7 +12,7 @@ def preprocess_image(image: Image.Image) -> Image.Image:
     return image
 
 
-def extract_text(image_path: str, lang: str = "eng") -> str:
+def extract_text(image_path: str, lang: str = "nep+eng") -> str:
     image = Image.open(image_path)
     image = preprocess_image(image)
     text = pytesseract.image_to_string(image, lang=lang)

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.ocr import extract_text, parse_receipt, parse_receipt_llm
 from app.db.session import get_db
 from app.models import Expense, ExpenseItem
+from app.core.security import get_current_user
 from datetime import datetime
 import tempfile
 import os
@@ -61,7 +62,7 @@ async def extract_receipt_llm(file: UploadFile = File(...)):
 
 
 @router.post("/extract/receipt/llm/save")
-async def extract_and_save(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def extract_and_save(file: UploadFile = File(...), db: Session = Depends(get_db), user_id: str = Depends(get_current_user)  ):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
@@ -81,6 +82,7 @@ async def extract_and_save(file: UploadFile = File(...), db: Session = Depends(g
 
         # Save expense
         expense = Expense(
+            user_id=user_id,
             vendor=parsed.get("vendor"),
             date=date,
             total_amount=parsed.get("total_amount"),

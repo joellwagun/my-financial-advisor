@@ -5,16 +5,14 @@
 
 import { useNavigate } from "react-router-dom";
 
-// These are Shadcn components — imported from the ui folder that shadcn created
-// Button — a pre-styled button with variants (default, outline, ghost etc.)
+// These are Shadcn components, imported from the ui folder that shadcn created
+// Button : a pre-styled button.
 import { Button } from "@/components/ui/button";
-// Card — a pre-styled white card with border and rounded corners
+// Card : a pre-styled white card with border and rounded corners
 import { Card, CardContent } from "@/components/ui/card";
 
-// ─── HELPER COMPONENTS ───────────────────────────────────────────────────────────
 
-// FeatureCard — one of the 3 feature cards
-// Props: icon, title, desc, iconBg
+// FeatureCard — one of the 3 
 function FeatureCard({ icon, title, desc, iconBg }) {
   return (
     // Card is from Shadcn — gives us the white box with border automatically

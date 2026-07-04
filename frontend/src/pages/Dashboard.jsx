@@ -1,11 +1,13 @@
 // Dashboard.jsx
-// Main dashboard page rebuilt using Shadcn UI components and Tailwind CSS.
-// Currently uses hardcoded/dummy data — will be made dynamic once the
-// backend auth + expenses endpoints are ready.
+// Dashboard wired to the real backend.
+// Uses 3 endpoints:
+//   GET /auth/me            -> { full_name, email, ... }      (who's logged in)
+//   GET /expenses/summary   -> { total_spent, total_receipts, by_category }
+//   GET /expenses/monthly   -> { monthly: { "2026-05": 1234, ... } }
+//   GET /expenses           -> [ { vendor, date, total_amount, category, ... } ]
 
 import { useState, useEffect } from "react";
 
-// Chart.js setup — same as before
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -30,116 +32,71 @@ ChartJS.register(
   Legend,
 );
 
-// Shadcn components
+import client from "@/api/client";
 import { Card, CardContent } from "@/components/ui/card";
 
-// ─── DUMMY DATA ─────────────────────────────────────────────────────────────────
-// Replace with real API calls later:
-//   client.get("/expenses").then(res => setExpenses(res.data))
-
-const DUMMY_EXPENSES = [
-  {
-    id: 1,
-    vendor: "Bhat Bhateni",
-    date: "Jun 15",
-    amount: 1850,
-    category: "Shopping",
-  },
-  {
-    id: 2,
-    vendor: "Pathao",
-    date: "Jun 14",
-    amount: 350,
-    category: "Transport",
-  },
-  {
-    id: 3,
-    vendor: "KFC Thamel",
-    date: "Jun 13",
-    amount: 920,
-    category: "Food",
-  },
-  {
-    id: 4,
-    vendor: "Medicare",
-    date: "Jun 12",
-    amount: 600,
-    category: "Health",
-  },
-  {
-    id: 5,
-    vendor: "NEA Bill",
-    date: "Jun 11",
-    amount: 1200,
-    category: "Utilities",
-  },
-];
-
-// One color per category — used consistently across charts, badges, and dots
+// One color per category — used consistently across charts, badges, dots
 const CATEGORY_COLORS = {
   Food: "#1D9E75",
   Transport: "#378ADD",
   Shopping: "#D85A30",
   Health: "#D4537E",
   Utilities: "#BA7517",
+  Entertainment: "#9B59B6",
   Other: "#888780",
 };
+function colorFor(category) {
+  return CATEGORY_COLORS[category] || CATEGORY_COLORS.Other;
+}
 
 // ─── HELPER COMPONENTS ───────────────────────────────────────────────────────────
 
-// SummaryCard — the 3 cards at the top
-// Props: label, value, sub
 function SummaryCard({ label, value, sub }) {
   return (
     <Card>
       <CardContent className="p-4">
         <p className="text-xs text-muted-foreground mb-1.5">{label}</p>
         <p className="text-2xl font-medium">{value}</p>
-        <p className="text-xs text-muted-foreground mt-1">{sub}</p>
+        {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
       </CardContent>
     </Card>
   );
 }
 
-// CategoryBadge — colored pill showing category name
-// Props: category
 function CategoryBadge({ category }) {
-  const color = CATEGORY_COLORS[category] || CATEGORY_COLORS.Other;
+  const color = colorFor(category);
   return (
     <span
       className="text-xs px-2 py-0.5 rounded-full mr-2"
       style={{ background: color + "1A", color: color }}
-      // "1A" appended to hex = ~10% opacity background
     >
-      {category}
+      {category || "Other"}
     </span>
   );
 }
 
-// ExpenseRow — one row in the recent expenses list
-// Props: expense
 function ExpenseRow({ expense }) {
-  const color = CATEGORY_COLORS[expense.category] || CATEGORY_COLORS.Other;
+  const color = colorFor(expense.category);
   return (
     <div className="flex items-center justify-between py-2.5 border-b last:border-b-0">
-      {/* last:border-b-0 — Tailwind removes the border on the LAST row only */}
-
       <div className="flex items-center gap-2.5">
-        {/* Colored dot matching the category color */}
         <div
           className="w-2 h-2 rounded-full shrink-0"
           style={{ background: color }}
         />
         <div>
-          <p className="text-sm font-medium">{expense.vendor}</p>
-          <p className="text-xs text-muted-foreground">{expense.date}</p>
+          <p className="text-sm font-medium">
+            {expense.vendor || "Unknown vendor"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {expense.date || "No date"}
+          </p>
         </div>
       </div>
-
       <div className="flex items-center">
         <CategoryBadge category={expense.category} />
         <span className="text-sm font-medium">
-          Rs. {expense.amount.toLocaleString()}
+          {expense.currency || "Rs."} {expense.total_amount ?? 0}
         </span>
       </div>
     </div>
@@ -149,18 +106,45 @@ function ExpenseRow({ expense }) {
 // ─── MAIN DASHBOARD COMPONENT ───────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const [expenses, setExpenses] = useState(DUMMY_EXPENSES);
-  const [totalSpent] = useState(12450);
-  const [receiptCount] = useState(24);
+  const [userName, setUserName] = useState("");
+  const [expenses, setExpenses] = useState([]);
+  const [summary, setSummary] = useState({
+    total_spent: 0,
+    total_receipts: 0,
+    by_category: {},
+  });
+  const [monthly, setMonthly] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // useEffect — runs once when the page loads
-  // This is where the real API call will go later
+  // useEffect runs once when the page loads.
+  // We fire all 4 requests at once with Promise.all so they load in parallel
+  // instead of waiting for each one to finish before starting the next.
   useEffect(() => {
-    // TODO: replace with real API call once backend is ready
-    // client.get("/expenses").then(res => setExpenses(res.data))
+    async function loadDashboard() {
+      try {
+        const [meRes, expensesRes, summaryRes, monthlyRes] = await Promise.all([
+          client.get("/auth/me"),
+          client.get("/expenses"),
+          client.get("/expenses/summary"),
+          client.get("/expenses/monthly"),
+        ]);
+
+        setUserName(meRes.data.full_name || meRes.data.email);
+        setExpenses(expensesRes.data);
+        setSummary(summaryRes.data);
+        setMonthly(monthlyRes.data.monthly);
+      } catch (err) {
+        console.error("Failed to load dashboard:", err);
+        // If the token is missing/expired, the backend returns 401.
+        // In a later step we'll redirect to /login automatically on 401.
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboard();
   }, []);
 
-  // Today's date as a readable string
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -168,20 +152,18 @@ export default function Dashboard() {
     day: "numeric",
   });
 
-  // ── CHART DATA ──
+  // ── BUILD CHART DATA FROM REAL API RESPONSES ──
+
+  // by_category looks like: { "Food": 4200, "Transport": 2100, ... }
+  const categoryLabels = Object.keys(summary.by_category);
+  const categoryAmounts = Object.values(summary.by_category);
 
   const barData = {
-    labels: ["Food", "Transport", "Shopping", "Health", "Utilities"],
+    labels: categoryLabels,
     datasets: [
       {
-        data: [4200, 2100, 3100, 1500, 1550],
-        backgroundColor: [
-          CATEGORY_COLORS.Food,
-          CATEGORY_COLORS.Transport,
-          CATEGORY_COLORS.Shopping,
-          CATEGORY_COLORS.Health,
-          CATEGORY_COLORS.Utilities,
-        ],
+        data: categoryAmounts,
+        backgroundColor: categoryLabels.map(colorFor),
         borderRadius: 4,
       },
     ],
@@ -198,15 +180,19 @@ export default function Dashboard() {
     },
     scales: {
       x: { grid: { display: false } },
-      y: { ticks: { callback: (v) => "Rs." + (v / 1000).toFixed(0) + "k" } },
+      y: { ticks: { callback: (v) => "Rs." + v.toLocaleString() } },
     },
   };
 
+  // monthly looks like: { "2026-01": 9200, "2026-02": 10500, ... }
+  const monthLabels = Object.keys(monthly);
+  const monthAmounts = Object.values(monthly);
+
   const lineData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: monthLabels,
     datasets: [
       {
-        data: [9200, 10500, 8800, 11200, 13000, 12450],
+        data: monthAmounts,
         borderColor: "#534AB7",
         backgroundColor: "rgba(83,74,183,0.08)",
         fill: true,
@@ -228,53 +214,63 @@ export default function Dashboard() {
     },
     scales: {
       x: { grid: { display: false } },
-      y: { ticks: { callback: (v) => "Rs." + (v / 1000).toFixed(0) + "k" } },
+      y: { ticks: { callback: (v) => "Rs." + v.toLocaleString() } },
     },
   };
 
+  // Find the top category by amount, for the 3rd summary card
+  const topCategory = categoryLabels.length
+    ? categoryLabels.reduce((a, b) =>
+        summary.by_category[a] > summary.by_category[b] ? a : b,
+      )
+    : "—";
+
   // ── RENDER ──
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 text-center text-muted-foreground">
+        Loading your dashboard...
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      {/*
-        max-w-4xl — limits page width so it doesn't stretch too wide on big screens
-        mx-auto — centers the whole dashboard horizontally
-        p-6 — padding all around
-      */}
-
-      {/* ── HEADER ── */}
       <div className="mb-6">
-        <h1 className="text-xl font-medium">Good morning, Kushal 👋</h1>
+        <h1 className="text-xl font-medium">Good morning, {userName} 👋</h1>
         <p className="text-sm text-muted-foreground mt-1">{today}</p>
       </div>
 
-      {/* ── SUMMARY CARDS ──
-          grid-cols-3 — 3 equal columns side by side */}
       <div className="grid grid-cols-3 gap-2.5 mb-6">
         <SummaryCard
-          label="Total spent this month"
-          value={`Rs. ${totalSpent.toLocaleString()}`}
-          sub="↑ 8% from last month"
+          label="Total spent"
+          value={`Rs. ${summary.total_spent.toLocaleString()}`}
         />
+        <SummaryCard label="Receipts scanned" value={summary.total_receipts} />
         <SummaryCard
-          label="Receipts scanned"
-          value={receiptCount}
-          sub="this month"
+          label="Top category"
+          value={topCategory}
+          sub={
+            topCategory !== "—"
+              ? `Rs. ${summary.by_category[topCategory].toLocaleString()} spent`
+              : null
+          }
         />
-        <SummaryCard label="Top category" value="Food" sub="Rs. 4,200 spent" />
       </div>
 
-      {/* ── CHARTS ──
-          grid-cols-2 — 2 equal columns side by side */}
       <div className="grid grid-cols-2 gap-3 mb-6">
         <Card>
           <CardContent className="p-4">
             <p className="text-sm font-medium text-muted-foreground mb-3">
               Spending by category
             </p>
-            {/* relative + fixed height is required for Chart.js to render correctly */}
             <div className="relative h-44">
-              <Bar data={barData} options={barOptions} />
+              {categoryLabels.length > 0 ? (
+                <Bar data={barData} options={barOptions} />
+              ) : (
+                <p className="text-sm text-muted-foreground">No data yet</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -285,21 +281,28 @@ export default function Dashboard() {
               Monthly trend
             </p>
             <div className="relative h-44">
-              <Line data={lineData} options={lineOptions} />
+              {monthLabels.length > 0 ? (
+                <Line data={lineData} options={lineOptions} />
+              ) : (
+                <p className="text-sm text-muted-foreground">No data yet</p>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* ── RECENT EXPENSES ── */}
       <Card>
         <CardContent className="p-4">
           <p className="text-sm font-medium text-muted-foreground mb-3">
             Recent expenses
           </p>
 
-          {/* .map() loops over the expenses array and renders one row per item
-              key={expense.id} is required by React to track each item efficiently */}
+          {expenses.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No expenses yet — upload a receipt to get started!
+            </p>
+          )}
+
           {expenses.map((expense) => (
             <ExpenseRow key={expense.id} expense={expense} />
           ))}

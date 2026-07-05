@@ -31,7 +31,7 @@ export default function Navbar() {
         <div className="w-7 h-7 bg-[#EEEDFE] rounded-lg flex items-center justify-center text-base">
           💼
         </div>
-        <span className="text-sm font-medium">FinAdvisor</span>
+        <span className="text-sm font-medium">My Financial Advisor</span>
       </div>
 
       {/* Nav links */}

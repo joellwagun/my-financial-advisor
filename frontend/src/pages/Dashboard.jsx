@@ -1,13 +1,13 @@
 // Dashboard.jsx
 // Dashboard wired to the real backend.
-// Uses 3 endpoints:
-//   GET /auth/me            -> { full_name, email, ... }      (who's logged in)
+// Uses 4 endpoints:
+//   GET /auth/me            -> { full_name, email, ... }
 //   GET /expenses/summary   -> { total_spent, total_receipts, by_category }
 //   GET /expenses/monthly   -> { monthly: { "2026-05": 1234, ... } }
 //   GET /expenses           -> [ { vendor, date, total_amount, category, ... } ]
 
 import { useState, useEffect } from "react";
-
+import Navbar from "@/components/Navbar";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -20,6 +20,8 @@ import {
   Legend,
 } from "chart.js";
 import { Bar, Line } from "react-chartjs-2";
+import client from "@/api/client";
+import { Card, CardContent } from "@/components/ui/card";
 
 ChartJS.register(
   CategoryScale,
@@ -32,10 +34,6 @@ ChartJS.register(
   Legend,
 );
 
-import client from "@/api/client";
-import { Card, CardContent } from "@/components/ui/card";
-
-// One color per category — used consistently across charts, badges, dots
 const CATEGORY_COLORS = {
   Food: "#1D9E75",
   Transport: "#378ADD",
@@ -45,11 +43,10 @@ const CATEGORY_COLORS = {
   Entertainment: "#9B59B6",
   Other: "#888780",
 };
+
 function colorFor(category) {
   return CATEGORY_COLORS[category] || CATEGORY_COLORS.Other;
 }
-
-// ─── HELPER COMPONENTS ───────────────────────────────────────────────────────────
 
 function SummaryCard({ label, value, sub }) {
   return (
@@ -103,8 +100,6 @@ function ExpenseRow({ expense }) {
   );
 }
 
-// ─── MAIN DASHBOARD COMPONENT ───────────────────────────────────────────────────
-
 export default function Dashboard() {
   const [userName, setUserName] = useState("");
   const [expenses, setExpenses] = useState([]);
@@ -116,9 +111,6 @@ export default function Dashboard() {
   const [monthly, setMonthly] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // useEffect runs once when the page loads.
-  // We fire all 4 requests at once with Promise.all so they load in parallel
-  // instead of waiting for each one to finish before starting the next.
   useEffect(() => {
     async function loadDashboard() {
       try {
@@ -128,20 +120,16 @@ export default function Dashboard() {
           client.get("/expenses/summary"),
           client.get("/expenses/monthly"),
         ]);
-
         setUserName(meRes.data.full_name || meRes.data.email);
         setExpenses(expensesRes.data);
         setSummary(summaryRes.data);
         setMonthly(monthlyRes.data.monthly);
       } catch (err) {
         console.error("Failed to load dashboard:", err);
-        // If the token is missing/expired, the backend returns 401.
-        // In a later step we'll redirect to /login automatically on 401.
       } finally {
         setLoading(false);
       }
     }
-
     loadDashboard();
   }, []);
 
@@ -152,9 +140,6 @@ export default function Dashboard() {
     day: "numeric",
   });
 
-  // ── BUILD CHART DATA FROM REAL API RESPONSES ──
-
-  // by_category looks like: { "Food": 4200, "Transport": 2100, ... }
   const categoryLabels = Object.keys(summary.by_category);
   const categoryAmounts = Object.values(summary.by_category);
 
@@ -184,7 +169,6 @@ export default function Dashboard() {
     },
   };
 
-  // monthly looks like: { "2026-01": 9200, "2026-02": 10500, ... }
   const monthLabels = Object.keys(monthly);
   const monthAmounts = Object.values(monthly);
 
@@ -218,96 +202,101 @@ export default function Dashboard() {
     },
   };
 
-  // Find the top category by amount, for the 3rd summary card
   const topCategory = categoryLabels.length
     ? categoryLabels.reduce((a, b) =>
         summary.by_category[a] > summary.by_category[b] ? a : b,
       )
     : "—";
 
-  // ── RENDER ──
-
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto p-6 text-center text-muted-foreground">
-        Loading your dashboard...
+      <div>
+        <Navbar />
+        <div className="max-w-4xl mx-auto p-6 text-center text-muted-foreground">
+          Loading dashboard...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-xl font-medium">Good morning, {userName} 👋</h1>
-        <p className="text-sm text-muted-foreground mt-1">{today}</p>
-      </div>
+    <div>
+      <Navbar />
 
-      <div className="grid grid-cols-3 gap-2.5 mb-6">
-        <SummaryCard
-          label="Total spent"
-          value={`Rs. ${summary.total_spent.toLocaleString()}`}
-        />
-        <SummaryCard label="Receipts scanned" value={summary.total_receipts} />
-        <SummaryCard
-          label="Top category"
-          value={topCategory}
-          sub={
-            topCategory !== "—"
-              ? `Rs. ${summary.by_category[topCategory].toLocaleString()} spent`
-              : null
-          }
-        />
-      </div>
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="mb-6">
+          <h1 className="text-xl font-medium">Good morning, {userName} 👋</h1>
+          <p className="text-sm text-muted-foreground mt-1">{today}</p>
+        </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-2.5 mb-6">
+          <SummaryCard
+            label="Total spent"
+            value={`Rs. ${summary.total_spent.toLocaleString()}`}
+          />
+          <SummaryCard
+            label="Receipts scanned"
+            value={summary.total_receipts}
+          />
+          <SummaryCard
+            label="Top category"
+            value={topCategory}
+            sub={
+              topCategory !== "—"
+                ? `Rs. ${summary.by_category[topCategory].toLocaleString()} spent`
+                : null
+            }
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm font-medium text-muted-foreground mb-3">
+                Spending by category
+              </p>
+              <div className="relative h-44">
+                {categoryLabels.length > 0 ? (
+                  <Bar data={barData} options={barOptions} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">No data yet</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm font-medium text-muted-foreground mb-3">
+                Monthly trend
+              </p>
+              <div className="relative h-44">
+                {monthLabels.length > 0 ? (
+                  <Line data={lineData} options={lineOptions} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">No data yet</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <Card>
           <CardContent className="p-4">
             <p className="text-sm font-medium text-muted-foreground mb-3">
-              Spending by category
+              Recent expenses
             </p>
-            <div className="relative h-44">
-              {categoryLabels.length > 0 ? (
-                <Bar data={barData} options={barOptions} />
-              ) : (
-                <p className="text-sm text-muted-foreground">No data yet</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm font-medium text-muted-foreground mb-3">
-              Monthly trend
-            </p>
-            <div className="relative h-44">
-              {monthLabels.length > 0 ? (
-                <Line data={lineData} options={lineOptions} />
-              ) : (
-                <p className="text-sm text-muted-foreground">No data yet</p>
-              )}
-            </div>
+            {expenses.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No expenses yet — upload a receipt to get started!
+              </p>
+            )}
+            {expenses.map((expense) => (
+              <ExpenseRow key={expense.id} expense={expense} />
+            ))}
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardContent className="p-4">
-          <p className="text-sm font-medium text-muted-foreground mb-3">
-            Recent expenses
-          </p>
-
-          {expenses.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              No expenses yet — upload a receipt to get started!
-            </p>
-          )}
-
-          {expenses.map((expense) => (
-            <ExpenseRow key={expense.id} expense={expense} />
-          ))}
-        </CardContent>
-      </Card>
     </div>
   );
 }

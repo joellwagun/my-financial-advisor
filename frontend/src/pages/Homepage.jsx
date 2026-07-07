@@ -1,5 +1,4 @@
-// Homepage.jsx
-// Landing page rebuilt using Shadcn UI components and Tailwind CSS.
+// Landing page using Shadcn UI components and Tailwind CSS.
 // Shadcn gives us pre-built, styled components like Button, Card etc.
 // Tailwind gives us utility classes like "flex", "gap-2", "text-sm" instead of inline styles.
 
@@ -10,10 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-// FeatureCard — one of the 3
+// FeatureCard ; one of the 3
 function FeatureCard({ icon, title, desc, iconBg }) {
   return (
-    // Card is from Shadcn — gives us the white box with border automatically
+    // Card is from Shadcn = gives us the white box with border automatically
     <Card>
       <CardContent className="p-5">
         {/* Icon circle */}
@@ -33,7 +32,7 @@ function FeatureCard({ icon, title, desc, iconBg }) {
   );
 }
 
-// StepCard — one of the 3 "how it works" steps
+// StepCard = one of the 3 "how it works" steps
 function StepCard({ number, title, desc }) {
   return (
     <div className="text-center">
@@ -57,9 +56,9 @@ export default function Homepage() {
   return (
     <div className="min-h-screen font-sans">
       {/* ── NAVBAR ──
-          flex — makes children sit side by side
-          justify-between — pushes logo left, buttons right
-          border-b — adds a bottom border line */}
+          flex = makes children sit side by side
+          justify-between = pushes logo left, buttons right
+          border-b = adds a bottom border line */}
       <nav className="flex items-center justify-between px-6 py-4 border-b">
         {/* Logo + name */}
         <div className="flex items-center gap-2">
@@ -83,8 +82,8 @@ export default function Homepage() {
       </nav>
 
       {/* ── HERO SECTION ──
-          text-center — centers all text
-          py-16 — padding top and bottom (16 * 4px = 64px) */}
+          text-center = centers all text
+          py-16 = padding top and bottom (16 * 4px = 64px) */}
       <div className="text-center px-6 py-16">
         {/* Headline */}
         <h1 className="text-4xl font-medium leading-tight mb-4">
@@ -94,15 +93,15 @@ export default function Homepage() {
         </h1>
 
         {/* Subtext
-            max-w-md — limits width so text does not stretch too wide
-            mx-auto — centers it */}
+            max-w-md = limits width so text does not stretch too wide
+            mx-auto = centers it */}
         <p className="text-muted-foreground text-base max-w-md mx-auto mb-6 leading-relaxed">
           Upload a receipt and let AI extract vendor, date, and amount
           automatically. See your spending at a glance.
         </p>
 
         {/* CTA Buttons
-            size="lg" — Shadcn button size variant (sm, default, lg) */}
+            size="lg" = Shadcn button size variant (sm, default, lg) */}
         <div className="flex gap-3 justify-center">
           <Button size="lg" onClick={() => navigate("/register")}>
             Get started for free
@@ -118,8 +117,8 @@ export default function Homepage() {
       </div>
 
       {/* ── FEATURES SECTION ──
-          grid grid-cols-3 — 3 equal columns
-          gap-3 — space between cards */}
+          grid grid-cols-3 = 3 equal columns
+          gap-3 = space between cards */}
       <div className="grid grid-cols-3 gap-3 px-6 pb-12">
         <FeatureCard
           icon="📷"

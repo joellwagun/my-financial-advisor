@@ -1,4 +1,3 @@
-// Login.jsx
 // Login page wired to the real backend.
 // Backend endpoint: POST /auth/login
 // Expects JSON body: { email, password }

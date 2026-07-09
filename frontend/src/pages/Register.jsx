@@ -71,7 +71,7 @@ export default function Register() {
 
   // ── SUBMIT HANDLER ──
   // Backend's UserCreate schema only needs: email, password, full_name
-  // We don't send confirmPassword — that's a frontend-only check
+  // We don't send confirmPassword = that's a frontend-only check
   const onSubmit = async (data) => {
     setServerError(null);
 
@@ -82,7 +82,7 @@ export default function Register() {
         full_name: data.full_name,
       });
 
-      // Registration succeeded -> send them to login to sign in
+      // Registration succeeded => send them to login to sign in
       navigate("/login");
     } catch (err) {
       // e.g. "Email already registered" (from your backend's HTTPException)

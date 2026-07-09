@@ -1,7 +1,7 @@
 // App.jsx
 // Defines all the routes in the app.
-// Public routes — anyone can visit (Homepage, Login, Register)
-// Protected routes — only logged in users can visit (Dashboard, Upload, Expenses, Chat)
+// Public routes = anyone can visit (Homepage, Login, Register)
+// Protected routes = only logged in users can visit (Dashboard, Upload, Expenses, Chat)
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -29,7 +29,7 @@ export default function App() {
 
         {/* ── PROTECTED ROUTES ──
             Only logged in users can visit these.
-            If not logged in → redirected to /login automatically.
+            If not logged in = redirected to /login automatically.
             We wrap each page with <ProtectedRoute> </ProtectedRoute> */}
         <Route
           path="/dashboard"

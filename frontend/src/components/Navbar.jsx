@@ -15,7 +15,7 @@ export default function Navbar() {
   // Check if a path is the current page
   const isActive = (path) => location.pathname === path;
 
-  // Logout — clear the token and go to login
+  // Logout = clear the token and go to login
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");

@@ -23,7 +23,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-// ─── VALIDATION SCHEMA ───────────────────────────────────────────────────────────
+// --- VALIDATION SCHEMA ---
 
 const registerSchema = z
   .object({
@@ -49,7 +49,7 @@ const registerSchema = z
     path: ["confirmPassword"],
   });
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────────
+// --- MAIN COMPONENT ---
 
 export default function Register() {
   const navigate = useNavigate();
@@ -69,7 +69,7 @@ export default function Register() {
     },
   });
 
-  // ── SUBMIT HANDLER ──
+  // --- SUBMIT HANDLER ---
   // Backend's UserCreate schema only needs: email, password, full_name
   // We don't send confirmPassword = that's a frontend-only check
   const onSubmit = async (data) => {

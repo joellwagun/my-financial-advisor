@@ -14,20 +14,20 @@ import Upload from "./pages/Upload";
 import Expenses from "./pages/Expenses";
 import Chat from "./pages/Chat";
 
-// ProtectedRoute — the gatekeeper component
+// ProtectedRoute = the gatekeeper component
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ── PUBLIC ROUTES ──
+        {/* --- PUBLIC ROUTES ---
             Anyone can visit these, logged in or not */}
         <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* ── PROTECTED ROUTES ──
+        {/* --- PROTECTED ROUTES ---
             Only logged in users can visit these.
             If not logged in = redirected to /login automatically.
             We wrap each page with <ProtectedRoute> </ProtectedRoute> */}

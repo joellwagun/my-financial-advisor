@@ -24,7 +24,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-// ─── VALIDATION SCHEMA ───────────────────────────────────────────────────────────
+// --- VALIDATION SCHEMA ---
 
 const loginSchema = z.object({
   email: z
@@ -35,7 +35,7 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────────
+// --- MAIN COMPONENT ---
 
 export default function Login() {
   const navigate = useNavigate();
@@ -50,9 +50,9 @@ export default function Login() {
     defaultValues: { email: "", password: "" },
   });
 
-  // ── SUBMIT HANDLER ──
-  // Calls the real backend now.
-  // IMPORTANT: your team's /auth/login expects JSON { email, password }
+  // --- SUBMIT HANDLER ---
+  // Calls the real backend.
+  // /auth/login expects JSON { email, password }
   // (it reuses the UserCreate schema, not OAuth2PasswordRequestForm)
   const onSubmit = async (data) => {
     setServerError(null);

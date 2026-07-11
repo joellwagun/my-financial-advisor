@@ -64,7 +64,7 @@ export default function Homepage() {
         {/* Logo + name */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#EEEDFE] rounded-lg flex items-center justify-center text-lg">
-            💼
+            💰
           </div>
           <span className="text-sm font-medium">My Financial Advisor</span>
         </div>
@@ -122,19 +122,19 @@ export default function Homepage() {
           gap-3 — space between cards */}
       <div className="grid grid-cols-3 gap-3 px-6 pb-12">
         <FeatureCard
-          icon="📷"
+          icon="🧾"
           title="OCR scanning"
           desc="Take a photo of any receipt and we extract the details automatically."
           iconBg="#E1F5EE"
         />
         <FeatureCard
-          icon="📊"
+          icon="📈"
           title="Smart dashboard"
           desc="Visual breakdown of your spending by category and month."
           iconBg="#EEEDFE"
         />
         <FeatureCard
-          icon="🤖"
+          icon="🧠"
           title="AI powered"
           desc="Local AI keeps your financial data private — nothing leaves your machine."
           iconBg="#FAECE7"

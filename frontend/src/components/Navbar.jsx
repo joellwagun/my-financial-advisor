@@ -29,7 +29,7 @@ export default function Navbar() {
         onClick={() => navigate("/dashboard")}
       >
         <div className="w-7 h-7 bg-[#EEEDFE] rounded-lg flex items-center justify-center text-base">
-          💼
+          💰
         </div>
         <span className="text-sm font-medium">My Financial Advisor</span>
       </div>

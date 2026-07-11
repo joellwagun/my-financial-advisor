@@ -83,7 +83,7 @@ export default function Login() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="w-11 h-11 bg-[#EEEDFE] rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
-            💼
+            💰
           </div>
           <CardTitle className="text-lg">Welcome back</CardTitle>
           <CardDescription>Sign in to your financial advisor</CardDescription>

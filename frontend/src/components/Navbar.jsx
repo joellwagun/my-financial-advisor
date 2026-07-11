@@ -18,7 +18,7 @@ export default function Navbar() {
   // Logout = clear the token and go to login
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/", { replace: true }); // replace = don't allow back button to go back to protected page
   };
 
   return (

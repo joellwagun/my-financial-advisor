@@ -1,7 +1,7 @@
 // App.jsx
 // Defines all the routes in the app.
-// Public routes — anyone can visit (Homepage, Login, Register)
-// Protected routes — only logged in users can visit (Dashboard, Upload, Expenses, Chat)
+// Public routes = anyone can visit (Homepage, Login, Register)
+// Protected routes = only logged in users can visit (Dashboard, Upload, Expenses, Chat)
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -14,22 +14,22 @@ import Upload from "./pages/Upload";
 import Expenses from "./pages/Expenses";
 import Chat from "./pages/Chat";
 
-// ProtectedRoute — the gatekeeper component
+// ProtectedRoute = the gatekeeper component
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ── PUBLIC ROUTES ──
+        {/* --- PUBLIC ROUTES ---
             Anyone can visit these, logged in or not */}
         <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* ── PROTECTED ROUTES ──
+        {/* --- PROTECTED ROUTES ---
             Only logged in users can visit these.
-            If not logged in → redirected to /login automatically.
+            If not logged in = redirected to /login automatically.
             We wrap each page with <ProtectedRoute> </ProtectedRoute> */}
         <Route
           path="/dashboard"

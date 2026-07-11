@@ -21,7 +21,7 @@ export default function Upload() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  // Step 1 — user picks a file
+  // Step 1 - user picks a file
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -32,8 +32,8 @@ export default function Upload() {
     setError(null);
   };
 
-  // Step 2 — user clicks "Scan & save"
-  // Sends the image to the backend — OCR + LLM + DB save all in one call
+  // Step 2 - user clicks "Scan & save"
+  // Sends the image to the backend = OCR + LLM + DB save all in one call
   const handleScan = async () => {
     setScanning(true);
     setError(null);
@@ -121,7 +121,7 @@ export default function Upload() {
           </CardContent>
         </Card>
 
-        {/* Scan button — only shows if file is picked and not yet scanned */}
+        {/* Scan button = only shows if file is picked and not yet scanned */}
         {file && !result && (
           <Button
             className="w-full mb-4"
@@ -132,7 +132,7 @@ export default function Upload() {
           </Button>
         )}
 
-        {/* Result card — shows what was extracted */}
+        {/* Result card = shows what was extracted */}
         {result && (
           <Card>
             <CardContent className="p-5 space-y-3">

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Chat() {
-  // messages — the conversation history
+  // messages = the conversation history
   // Each message has a role ("user" or "ai") and text
   const [messages, setMessages] = useState([
     { role: "ai", text: "Hi! Ask me anything about your expenses." },

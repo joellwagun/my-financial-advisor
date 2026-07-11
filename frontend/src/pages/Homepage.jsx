@@ -1,7 +1,6 @@
-// Homepage.jsx
-// Landing page rebuilt using Shadcn UI components and Tailwind CSS.
-// Shadcn gives us pre-built, styled components like Button, Card etc.
-// Tailwind gives us utility classes like "flex", "gap-2", "text-sm" instead of inline styles.
+// Landing page using Shadcn UI components and Tailwind CSS.
+// Shadcn = For pre-built, styled components like Button, Card etc.
+// Tailwind gives utility classes like "flex", "gap-2", "text-sm" instead of inline styles.
 
 import { useNavigate } from "react-router-dom";
 
@@ -10,10 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-// FeatureCard — one of the 3
+// FeatureCard ; one of the 3
 function FeatureCard({ icon, title, desc, iconBg }) {
   return (
-    // Card is from Shadcn — gives us the white box with border automatically
+    // Card is from Shadcn = gives us the white box with border automatically
     <Card>
       <CardContent className="p-5">
         {/* Icon circle */}
@@ -33,13 +32,13 @@ function FeatureCard({ icon, title, desc, iconBg }) {
   );
 }
 
-// StepCard — one of the 3 "how it works" steps
+// StepCard = one of the 3 "how it works" steps
 function StepCard({ number, title, desc }) {
   return (
     <div className="text-center">
       {/* Numbered circle
-          bg-[#EEEDFE] — Tailwind lets you use any hex color with square brackets
-          mx-auto — centers the div horizontally */}
+          bg-[#EEEDFE] = Tailwind lets you use any hex color with square brackets
+          mx-auto = centers the div horizontally */}
       <div className="w-9 h-9 rounded-full bg-[#EEEDFE] text-[#534AB7] flex items-center justify-center mx-auto mb-2 text-sm font-medium">
         {number}
       </div>
@@ -49,17 +48,17 @@ function StepCard({ number, title, desc }) {
   );
 }
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────────
+// --- MAIN COMPONENT ---
 
 export default function Homepage() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen font-sans">
-      {/* ── NAVBAR ──
-          flex — makes children sit side by side
-          justify-between — pushes logo left, buttons right
-          border-b — adds a bottom border line */}
+      {/* --- NAVBAR ---
+          flex = makes children sit side by side
+          justify-between = pushes logo left, buttons right
+          border-b = adds a bottom border line */}
       <nav className="flex items-center justify-between px-6 py-4 border-b">
         {/* Logo + name */}
         <div className="flex items-center gap-2">
@@ -82,9 +81,9 @@ export default function Homepage() {
         </div>
       </nav>
 
-      {/* ── HERO SECTION ──
-          text-center — centers all text
-          py-16 — padding top and bottom (16 * 4px = 64px) */}
+      {/* --- HERO SECTION ---
+          text-center = centers all text
+          py-16 = padding top and bottom (16 * 4px = 64px) */}
       <div className="text-center px-6 py-16">
         {/* Headline */}
         <h1 className="text-4xl font-medium leading-tight mb-4">
@@ -94,15 +93,15 @@ export default function Homepage() {
         </h1>
 
         {/* Subtext
-            max-w-md — limits width so text does not stretch too wide
-            mx-auto — centers it */}
+            max-w-md = limits width so text does not stretch too wide
+            mx-auto = centers it */}
         <p className="text-muted-foreground text-base max-w-md mx-auto mb-6 leading-relaxed">
           Upload a receipt and let AI extract vendor, date, and amount
           automatically. See your spending at a glance.
         </p>
 
         {/* CTA Buttons
-            size="lg" — Shadcn button size variant (sm, default, lg) */}
+            size="lg" = Shadcn button size variant (sm, default, lg) */}
         <div className="flex gap-3 justify-center">
           <Button size="lg" onClick={() => navigate("/register")}>
             Get started for free
@@ -117,9 +116,9 @@ export default function Homepage() {
         </div>
       </div>
 
-      {/* ── FEATURES SECTION ──
-          grid grid-cols-3 — 3 equal columns
-          gap-3 — space between cards */}
+      {/* --- FEATURES SECTION ---
+          grid grid-cols-3 = 3 equal columns
+          gap-3 = space between cards */}
       <div className="grid grid-cols-3 gap-3 px-6 pb-12">
         <FeatureCard
           icon="🧾"
@@ -141,7 +140,7 @@ export default function Homepage() {
         />
       </div>
 
-      {/* ── HOW IT WORKS ── */}
+      {/* --- HOW IT WORKS --- */}
       <div className="border-t px-6 py-10">
         <p className="text-xs font-medium text-muted-foreground text-center uppercase tracking-widest mb-6">
           How it works
@@ -165,7 +164,7 @@ export default function Homepage() {
         </div>
       </div>
 
-      {/* ── FOOTER ── */}
+      {/* --- FOOTER --- */}
       <div className="border-t px-6 py-4 flex justify-between items-center">
         <span className="text-sm text-muted-foreground">
           My Financial Advisor © 2026

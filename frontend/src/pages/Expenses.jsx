@@ -1,5 +1,4 @@
-// Expenses.jsx
-// Shows all of the logged-in user's expenses in a simple list.
+// To show all of the logged-in user's expenses in a simple list.
 // Backend endpoint: GET /expenses
 // Returns: [ { id, vendor, date, total_amount, currency, category, created_at } ]
 

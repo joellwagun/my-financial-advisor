@@ -2,6 +2,11 @@
 // Backend endpoint: GET /expenses
 // Returns: [ { id, vendor, date, total_amount, currency, category, created_at } ]
 
+// Expenses.jsx
+// Shows all of the logged-in user's expenses in a simple list.
+// Each expense card is clickable = clicking takes you to the detail page.
+// Backend endpoint: GET /expenses
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -93,10 +98,16 @@ export default function Expenses() {
           </Card>
         )}
 
-        {/* Expenses list */}
+        {/* Expenses list
+            Each card is clickable = navigate to /expenses/{id} */}
         <div className="space-y-3">
           {expenses.map((expense) => (
-            <Card key={expense.id}>
+            <Card
+              key={expense.id}
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate(`/expenses/${expense.id}`)}
+              // navigate to the detail page with this expense's ID in the URL
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   {/* Left: dot + vendor + date */}
@@ -115,12 +126,14 @@ export default function Expenses() {
                     </div>
                   </div>
 
-                  {/* Right: badge + amount */}
+                  {/* Right: badge + amount + arrow */}
                   <div className="flex items-center gap-3">
                     <CategoryBadge category={expense.category} />
                     <p className="text-sm font-medium">
                       {expense.currency || "Rs."} {expense.total_amount ?? "—"}
                     </p>
+                    {/* Arrow hint to show it's clickable */}
+                    <span className="text-muted-foreground text-sm"></span>
                   </div>
                 </div>
               </CardContent>

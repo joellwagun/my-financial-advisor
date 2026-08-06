@@ -1,22 +1,43 @@
 import pytesseract
-from PIL import Image, ImageFilter, ImageEnhance
+from PIL import Image, ImageFilter, ImageEnhance, ImageOps
 import ollama
 import json
 import re
+import cv2
+import numpy as np
+
 
 
 def preprocess_image(image: Image.Image) -> Image.Image:
     image = image.convert("L")
-    image = ImageEnhance.Contrast(image).enhance(2.0)
-    image = image.filter(ImageFilter.SHARPEN)
-    return image
+    w, h = image.size
+    if max(w, h) < 2000:
+        scale = 2000 / max(w, h)
+        image = image.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+
+    # Otsu thresholding — more robust than autocontrast+sharpen for uneven lighting/photos
+    arr = np.array(image)
+    _, thresh = cv2.threshold(arr, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return Image.fromarray(thresh)
 
 
-def extract_text(image_path: str, lang: str = "nep+eng") -> str:
+def extract_text(image_path: str, lang: str = "nep+eng", min_confidence: int = 50) -> str:
     image = Image.open(image_path)
+    image = ImageOps.exif_transpose(image)
     image = preprocess_image(image)
-    text = pytesseract.image_to_string(image, lang=lang)
-    return text.strip()
+
+    custom_config = r'--oem 3 --psm 6'
+    data = pytesseract.image_to_data(
+        image, lang=lang, config=custom_config, output_type=pytesseract.Output.DICT
+    )
+
+    words = []
+    for i, word in enumerate(data["text"]):
+        conf = int(data["conf"][i]) if data["conf"][i] != "-1" else -1
+        if word.strip() and conf >= min_confidence:
+            words.append(word)
+
+    return " ".join(words).strip()
 
 
 def parse_receipt_llm(raw_text: str) -> dict:
@@ -32,7 +53,7 @@ def parse_receipt_llm(raw_text: str) -> dict:
   "date": "YYYY-MM-DD or null",
   "total_amount": float or null,
   "currency": "string or null",
-  "category": "one of: Food, Transport, Shopping, Health, Utilities, Entertainment, Other",
+  "category": "one of: Food, Transport, Shopping, Health, Utilities, Entertainment,Cosmetics, Other",
   "items": [{{"name": "string", "amount": float}}]
 }}
 

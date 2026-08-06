@@ -1,4 +1,4 @@
-\//   4 endpoints:
+//   4 endpoints:
 //   GET /auth/me            = { full_name, email, ... }
 //   GET /expenses/summary   = { total_spent, total_receipts, by_category }
 //   GET /expenses/monthly   = { monthly: { "2026-05": 1234, ... } }
